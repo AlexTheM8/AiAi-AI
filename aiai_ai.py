@@ -1,3 +1,4 @@
+import os
 import pickle
 import time
 import warnings
@@ -8,12 +9,10 @@ import neat
 import numpy as np
 import pyautogui
 from PIL import ImageGrab
+from skimage.metrics import structural_similarity as compare_ssim
 from torch import hub
 
 from controller import Controller
-
-from skimage.metrics import structural_similarity as compare_ssim
-import os
 
 
 def get_ts():
@@ -30,15 +29,16 @@ def img_similarity(img, compare, shape, threshold=0.75):
 
     # Chroma key
     mask = cv2.inRange(compare, rgb_low, rgb_up)
-    com_copy = np.copy(compare)
-    com_copy[mask != 0], crop[mask != 0] = [0, 0, 0], [0, 0, 0]
+    com_copy, crop_copy = np.copy(compare), np.copy(crop)
+
+    com_copy = compare - cv2.bitwise_and(com_copy, com_copy, mask=mask)
+    crop_copy = crop - cv2.bitwise_and(crop_copy, crop_copy, mask=mask)
 
     # Convert to grayscale
-    crop = cv2.cvtColor(np.array(crop), cv2.COLOR_BGR2GRAY)
-    com_copy = cv2.cvtColor(np.array(com_copy), cv2.COLOR_BGR2GRAY)
+    crop_copy = cv2.cvtColor(crop_copy, cv2.COLOR_BGR2GRAY)
+    com_copy = cv2.cvtColor(com_copy, cv2.COLOR_BGR2GRAY)
 
-    score, _ = compare_ssim(com_copy, crop, full=True)
-    return score > threshold
+    return compare_ssim(com_copy, crop_copy) > threshold
 
 
 def interpret_and_act(img, x_input, y_input, st, g_max):
@@ -46,13 +46,15 @@ def interpret_and_act(img, x_input, y_input, st, g_max):
 
     controller.do_movement(x_input, y_input)
 
-    results = model(img, size=640).xyxy[0]
+    ref = model(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), size=640)
+    results = ref.xyxy[0]
     if len(results) > 0:
         x1, y1, x2, y2, prob, _ = results[0]
-        x1, y1, x2, y2, prob = float(x1), float(y1), float(x2), float(y2), float(prob)
-        g = (((x2 - x1) * (y2 - y1)) / (width * height)) * 50
-        if g > g_max:
-            g_max = g
+        if prob > 0.55:
+            x1, y1, x2, y2, prob = float(x1), float(y1), float(x2), float(y2), float(prob)
+            g = min((((x2 - x1) * (y2 - y1)) / (width * height)) * 150, 50)
+            if g > g_max:
+                g_max = g
 
     if img_similarity(img, time_over, to_shape):
         g_max -= 25  # [-25, 25]
@@ -73,8 +75,9 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
         p = pop
     net = neat.nn.recurrent.RecurrentNetwork.create(genome, cfg)
 
-    current_max_fitness, g_max, step = 0, 0, 0
-    done = False
+    time.sleep(1.85)
+
+    current_max_fitness, g_max, step, done = 0, 0, 0, False
 
     controller.load_state()
     print(f'{get_ts()}: INFO: running genome {genome_id} in generation {p.generation}')
@@ -105,6 +108,7 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
             print(f'{get_ts()}: INFO: generation: {p.generation}, genome: {genome_id}, fitness: {g_max}')
             if step > max_steps:
                 print(f'{get_ts()}: INFO: Timed out due to stagnation')
+                g_max -= 25
         genome.fitness = g_max
     controller.do_movement(0, 0)  # Reset movement
 
@@ -119,7 +123,7 @@ controller = Controller()
 
 # Image setup
 ImageGrab.grab = partial(ImageGrab.grab, all_screens=True)
-width, height, x_pad, y_pad, scale = 1300, 1000, 310, 30, 10
+width, height, x_pad, y_pad, scale = 1300, 1000, 310, 30, 25
 inx, iny, inc = width // scale, height // scale, 3
 rgb_low, rgb_up = np.array([0, 10, 0]), np.array([120, 255, 100])
 
@@ -141,7 +145,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 model = hub.load('yolov5', 'custom', 'yolov5/runs/train/exp/weights/best.pt', source='local')
 
-max_steps = 185
+max_steps = 500
 
 if __name__ == '__main__':
     # Network setup

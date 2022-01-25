@@ -11,10 +11,10 @@ class Controller:
     def load_state(self):
         self.gamepad.press_button(button=vg.DS4_BUTTONS.DS4_BUTTON_TRIANGLE)
         self.gamepad.update()
-        time.sleep(0.015)
+        time.sleep(0.01)
         self.gamepad.release_button(button=vg.DS4_BUTTONS.DS4_BUTTON_TRIANGLE)
         self.gamepad.update()
-        time.sleep(0.015)
+        time.sleep(0.01)
 
     def random_movement(self):
         self.gamepad.left_joystick_float(x_value_float=random.uniform(-1.0, 1.0),

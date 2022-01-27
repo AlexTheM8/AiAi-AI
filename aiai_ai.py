@@ -59,12 +59,12 @@ def interpret_and_act(img, x_input, y_input, st, g_max):
     if img_similarity(img, time_over, to_shape):
         g_max -= 25  # [-25, 25]
         done, info = True, 'Time Over'
-    elif img_similarity(img, goal, g_shape):
-        g_max = 30 + (1.25 * (60 - (time.time() - st)))  # [30, 105]
-        done, info = True, 'Goal'
     elif img_similarity(img, fall_out, fo_shape):
         g_max -= 50  # [-50, 0]
         done, info = True, 'Fall Out'
+    elif img_similarity(img, goal, g_shape):
+        g_max = 30 + (1.25 * (60 - (time.time() - st)))  # [30, 105]
+        done, info = True, 'Goal'
 
     return g_max, done, info
 
@@ -77,7 +77,7 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
 
     time.sleep(1.85)
 
-    current_max_fitness, g_max, step, done = 0, 0, 0, False
+    current_max_fitness, g_max, step, zero_step, done = 0, 0, 0, 0, False
 
     controller.load_state()
     print(f'{get_ts()}: INFO: running genome {genome_id} in generation {p.generation}')
@@ -101,12 +101,15 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
 
         if g_max > current_max_fitness:
             current_max_fitness = g_max
-            step = 0
+            step, zero_step = 0, 0
+        elif img_similarity(img, zero_mph, zm_shape, threshold=0.95):
+            zero_step += 60
         else:
             step += 1
-        if done or step > max_steps:
+            zero_step = 0
+        if done or step > max_steps or zero_step > max_steps:
             done = True
-            if step > max_steps:
+            if step > max_steps or zero_step > max_steps:
                 print(f'{get_ts()}: INFO: Timed out due to stagnation')
                 g_max -= 25
             print(f'{get_ts()}: INFO: generation: {p.generation}, genome: {genome_id}, fitness: {g_max}')
@@ -118,7 +121,7 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
 def update_stats(gen, sr, file='stats.csv'):
     with open(file, 'a') as f:
         f.write(','.join([str(gen), str(max_fitness[gen]), str(sr.get_fitness_mean()[-1]),
-                          str(sr.get_fitness_stdev()[-1])]))
+                          str(sr.get_fitness_stdev()[-1])]) + '\n')
 
 
 def eval_genomes(genomes, cfg):
@@ -152,6 +155,10 @@ g_shape = (g_x_pad - x_pad, g_y_pad - y_pad)
 fall_out = cv2.imread('images/fall_out.png')
 fo_x_pad, fo_y_pad = 430, 445
 fo_shape = (fo_x_pad - x_pad, fo_y_pad - y_pad)
+
+zero_mph = cv2.imread('images/zeromph.png')
+zm_x_pad, zm_y_pad = 385, 860
+zm_shape = (zm_x_pad - x_pad, zm_y_pad - y_pad)
 
 # Goal detection
 warnings.filterwarnings("ignore", category=UserWarning)

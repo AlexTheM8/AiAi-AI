@@ -5,6 +5,7 @@ import numpy as np
 import pyautogui
 from PIL import ImageGrab
 from skimage.metrics import structural_similarity as compare_ssim
+import aiai_ai
 
 # TODO
 """
@@ -32,38 +33,57 @@ or / 50 = 1560
 # model = hub.load('yolov5', 'custom', 'yolov5/runs/train/exp/weights/best.pt', source='local')
 
 ImageGrab.grab = partial(ImageGrab.grab, all_screens=True)
-x_pad, y_pad = 405, 460
+x_pad, y_pad = 385, 860
 
 # width, height = 250, 45
 # x_pad, y_pad = 850, 270
+shape = (x_pad - 310, y_pad-30)
 
-time_over = cv2.imread('images/time_over.png')
+# time_over = cv2.imread('images/time_over.png')
 # goal = cv2.imread('images/goal.png')
 # fall_out = cv2.imread('fall_out.png')
+zero_mph = cv2.imread('zeromph.png')
 
 # Mask range
-rgb_low, rgb_up = np.array([0, 10, 0]), np.array([120, 255, 100])
-# while True:
-# Grab new img
-img = pyautogui.screenshot(region=(x_pad, y_pad, time_over.shape[1], time_over.shape[0]))
-img = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
-# cv2.imwrite('time_over.png', img)
+# rgb_low, rgb_up = np.array([0, 10, 0]), np.array([120, 255, 100])
+while True:
+    # Grab new img
+    img = pyautogui.screenshot(region=(310, 30, 1000, 1300))
+    # img.show()
+    img = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+    # cv2.imwrite('zeromph.png', img)
+
+    crop = img[shape[1]:shape[1] + zero_mph.shape[0], shape[0]:shape[0] + zero_mph.shape[1]]
+
+    # Chroma key
+    mask = cv2.inRange(zero_mph, np.array([0, 10, 0]), np.array([120, 255, 100]))
+    com_copy, crop_copy = np.copy(zero_mph), np.copy(crop)
+
+    com_copy = zero_mph - cv2.bitwise_and(com_copy, com_copy, mask=mask)
+    crop_copy = crop - cv2.bitwise_and(crop_copy, crop_copy, mask=mask)
+
+    # Convert to grayscale
+    crop_copy = cv2.cvtColor(crop_copy, cv2.COLOR_BGR2GRAY)
+    com_copy = cv2.cvtColor(com_copy, cv2.COLOR_BGR2GRAY)
+
+    if compare_ssim(com_copy, crop_copy) > 0.95:
+        print(compare_ssim(com_copy, crop_copy))
 
 # Do masking
-mask = cv2.inRange(time_over, rgb_low, rgb_up)
-copy = np.copy(time_over)
+# mask = cv2.inRange(time_over, rgb_low, rgb_up)
+# copy = np.copy(time_over)
 # img_copy = np.copy(img)
 # copy[mask != 0], img[mask != 0] = [0, 0, 0], [0, 0, 0]
-copy = cv2.bitwise_and(copy, copy, mask=mask)
+# copy = cv2.bitwise_and(copy, copy, mask=mask)
 # cv2.imshow('copy', copy)
 # img_copy = cv2.bitwise_and(img, img, mask=mask)
 # cv2.imshow('img', img)
 
-copy = time_over - copy
-cv2.imshow('f', copy)
-
-img_copy = img - copy
-cv2.imshow('f2', img_copy)
+# copy = time_over - copy
+# cv2.imshow('f', copy)
+#
+# img_copy = img - copy
+# cv2.imshow('f2', img_copy)
 
 # Convert to gray
 # img = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2GRAY)
@@ -90,4 +110,4 @@ cv2.imshow('f2', img_copy)
 #     x1, y1, x2, y2, prob = float(x1), float(y1), float(x2), float(y2), float(prob)
 #     percent = (((x2 - x1) * (y2 - y1)) / (width * height)) * 100
 #     print(percent)
-cv2.waitKey(0)
+# cv2.waitKey(0)

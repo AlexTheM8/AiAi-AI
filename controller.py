@@ -23,9 +23,14 @@ class Controller:
         time.sleep(0.167)
 
     def do_movement(self, x, y):
+        x, y = clamp(x), clamp(y)
         self.gamepad.left_joystick_float(x_value_float=x, y_value_float=y)
         self.gamepad.update()
         time.sleep(0.01)
+
+
+def clamp(n, minimum=-1.0, maximum=1.0):
+    return max(minimum, min(n, maximum))
 
 
 if __name__ == "__main__":

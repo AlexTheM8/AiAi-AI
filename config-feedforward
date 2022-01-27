@@ -6,9 +6,8 @@ reset_on_extinction   = False
 
 [DefaultGenome]
 # node activation options
-activation_default      = sin
 activation_mutate_rate  = 0.05
-activation_options      = gauss sin tanh
+activation_options      = gauss identity tanh clamped sin
 #abs clamped cube exp gauss hat identity inv log relu sigmoid sin softplus square tanh
 
 # node aggregation options
@@ -38,7 +37,6 @@ enabled_default         = True
 enabled_mutate_rate     = 0.2
 
 feed_forward            = False
-#initial_connection      = unconnected
 initial_connection      = partial_nodirect 0.5
 
 # node add/remove rates
@@ -78,4 +76,4 @@ species_elitism      = 0
 
 [DefaultReproduction]
 elitism            = 1
-survival_threshold = 0.3
+survival_threshold = 0.1

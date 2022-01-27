@@ -105,17 +105,29 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
             step += 1
         if done or step > max_steps:
             done = True
-            print(f'{get_ts()}: INFO: generation: {p.generation}, genome: {genome_id}, fitness: {g_max}')
             if step > max_steps:
                 print(f'{get_ts()}: INFO: Timed out due to stagnation')
                 g_max -= 25
+            print(f'{get_ts()}: INFO: generation: {p.generation}, genome: {genome_id}, fitness: {g_max}')
         genome.fitness = g_max
     controller.do_movement(0, 0)  # Reset movement
+    return genome.fitness
+
+
+def update_stats(gen, sr, file='stats.csv'):
+    with open(file, 'a') as f:
+        f.write(','.join([str(gen), str(max_fitness[gen]), str(sr.get_fitness_mean()[-1]),
+                          str(sr.get_fitness_stdev()[-1])]))
 
 
 def eval_genomes(genomes, cfg):
+    if len(stat_reporter.get_fitness_mean()) > 0:
+        update_stats(p.generation-1, stat_reporter)
+    max_fit = -50
     for genome_id, genome in genomes:
-        conduct_genome(genome, cfg, genome_id)
+        fit = conduct_genome(genome, cfg, genome_id)
+        max_fit = max(max_fit, fit)
+    max_fitness[p.generation] = max_fit
 
 
 # Controller
@@ -145,9 +157,12 @@ warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 model = hub.load('yolov5', 'custom', 'yolov5/runs/train/exp/weights/best.pt', source='local')
 
-max_steps = 500
+max_steps = 1
 
 if __name__ == '__main__':
+    # TODO Flag for logging (options={full, partial, none} where partial includes stdout & non-timeouts)
+    # TODO Flag for stat-saving
+
     # Network setup
     checkpointer = neat.Checkpointer(generation_interval=1, filename_prefix='history/neat-checkpoint-')
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation,
@@ -155,15 +170,18 @@ if __name__ == '__main__':
     if len(os.listdir('history')) > 0:
         m = max([int(f[f.rfind('-') + 1:]) for f in os.listdir('history')])
         p = checkpointer.restore_checkpoint(f'history/neat-checkpoint-{m}')
+        p.generation += 1
         print(f'{get_ts()}: Restoring checkpoint {m}')
         p.config = config
     else:
         p = neat.Population(config)
     p.add_reporter(neat.StdOutReporter(True))
-    p.add_reporter(neat.StatisticsReporter())
+    stat_reporter = neat.StatisticsReporter()
+    p.add_reporter(stat_reporter)
     p.add_reporter(checkpointer)
 
-    # TODO Stat tracking
+    max_fitness = {}
+
     # Final
     winner = p.run(eval_genomes)
 

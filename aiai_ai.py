@@ -83,6 +83,7 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
     print(f'{get_ts()}: INFO: running genome {genome_id} in generation {p.generation}')
     st = time.time()
     while not done:
+        # TODO Consistent intervals (investigate further)
         # get next image
         img = get_img()
 
@@ -157,7 +158,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 model = hub.load('yolov5', 'custom', 'yolov5/runs/train/exp/weights/best.pt', source='local')
 
-max_steps = 1
+max_steps = 500
 
 if __name__ == '__main__':
     # TODO Flag for logging (options={full, partial, none} where partial includes stdout & non-timeouts)

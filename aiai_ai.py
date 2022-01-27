@@ -157,7 +157,7 @@ fo_x_pad, fo_y_pad = 430, 445
 fo_shape = (fo_x_pad - x_pad, fo_y_pad - y_pad)
 
 zero_mph = cv2.imread('images/zeromph.png')
-zm_x_pad, zm_y_pad = 385, 860
+zm_x_pad, zm_y_pad = 410, 880
 zm_shape = (zm_x_pad - x_pad, zm_y_pad - y_pad)
 
 # Goal detection

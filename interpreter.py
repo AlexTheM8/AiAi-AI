@@ -5,7 +5,6 @@ import numpy as np
 import pyautogui
 from PIL import ImageGrab
 from skimage.metrics import structural_similarity as compare_ssim
-import aiai_ai
 
 # TODO
 """
@@ -33,7 +32,7 @@ or / 50 = 1560
 # model = hub.load('yolov5', 'custom', 'yolov5/runs/train/exp/weights/best.pt', source='local')
 
 ImageGrab.grab = partial(ImageGrab.grab, all_screens=True)
-x_pad, y_pad = 385, 860
+x_pad, y_pad = 410, 880
 
 # width, height = 250, 45
 # x_pad, y_pad = 850, 270
@@ -66,7 +65,7 @@ while True:
     crop_copy = cv2.cvtColor(crop_copy, cv2.COLOR_BGR2GRAY)
     com_copy = cv2.cvtColor(com_copy, cv2.COLOR_BGR2GRAY)
 
-    if compare_ssim(com_copy, crop_copy) > 0.95:
+    if compare_ssim(com_copy, crop_copy) > 0.95:  # 0.858
         print(compare_ssim(com_copy, crop_copy))
 
 # Do masking

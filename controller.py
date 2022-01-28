@@ -30,6 +30,11 @@ class Controller:
 
 
 def clamp(n, minimum=-1.0, maximum=1.0):
+    # TODO Return to this
+    if n > maximum:
+        n = float('0.' + str(n).replace('.', ''))
+    if n < minimum:
+        n = float('-0.' + str(n).replace('.', '').replace('-', ''))
     return max(minimum, min(n, maximum))
 
 

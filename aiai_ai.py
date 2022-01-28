@@ -51,8 +51,8 @@ def interpret_and_act(img, x_input, y_input, st, g_max):
     if len(results) > 0:
         x1, y1, x2, y2, prob, _ = results[0]
         if prob > 0.55:
-            x1, y1, x2, y2, prob = float(x1), float(y1), float(x2), float(y2), float(prob)
-            g = min((((x2 - x1) * (y2 - y1)) / (width * height)) * 150, 50)
+            x1, y1, x2, y2 = float(x1), float(y1), float(x2), float(y2)
+            g = min((((x2 - x1) * (y2 - y1)) / (width * height)) * 150, 50)  # TODO Adjust goal size weight
             if g > g_max:
                 g_max = g
 
@@ -102,7 +102,7 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
         if g_max > current_max_fitness:
             current_max_fitness = g_max
             step, zero_step = 0, 0
-        elif img_similarity(img, zero_mph, zm_shape, threshold=0.95):
+        elif img_similarity(img, zero_mph, zm_shape, threshold=0.94):
             zero_step += 60
         else:
             step += 1

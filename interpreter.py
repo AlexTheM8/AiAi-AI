@@ -1,3 +1,4 @@
+import warnings
 from functools import partial
 
 import cv2
@@ -7,6 +8,8 @@ from PIL import ImageGrab
 from skimage.metrics import structural_similarity as compare_ssim
 
 # TODO
+from torch import hub
+
 """
  - Understand Image
     - Image States: [in-game, fall-out, time-out, goal]
@@ -28,8 +31,8 @@ from skimage.metrics import structural_similarity as compare_ssim
 NOTE: Input is set to 39000 = 3 * (width / 10) * (height / 10), could potentially change to / 20 = 9750 or / 25 = 6240
 or / 50 = 1560
 """
-# warnings.filterwarnings("ignore", category=UserWarning)
-# model = hub.load('yolov5', 'custom', 'yolov5/runs/train/exp/weights/best.pt', source='local')
+warnings.filterwarnings("ignore", category=UserWarning)
+model = hub.load('yolov5', 'custom', 'yolov5/runs/train/exp/weights/best.pt', source='local')
 
 ImageGrab.grab = partial(ImageGrab.grab, all_screens=True)
 x_pad, y_pad = 410, 880
@@ -41,17 +44,27 @@ shape = (x_pad - 310, y_pad-30)
 # time_over = cv2.imread('images/time_over.png')
 # goal = cv2.imread('images/goal.png')
 # fall_out = cv2.imread('fall_out.png')
-zero_mph = cv2.imread('zeromph.png')
+zero_mph = cv2.imread('images/zeromph.png')
 
 # Mask range
-# rgb_low, rgb_up = np.array([0, 10, 0]), np.array([120, 255, 100])
+rgb_low, rgb_up = np.array([0, 10, 0]), np.array([120, 255, 100])
 while True:
-    # Grab new img
     img = pyautogui.screenshot(region=(310, 30, 1000, 1300))
-    # img.show()
     img = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
-    # cv2.imwrite('zeromph.png', img)
-
+# ref = model(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), size=640)
+#     results = ref.xyxy[0]
+#     if len(results) > 0:
+#         x1, y1, x2, y2, prob, _ = results[0]
+#         # if prob > 0.55:
+#         x1, y1, x2, y2 = float(x1), float(y1), float(x2), float(y2)
+#         print(prob)
+#         print(min((((x2 - x1) * (y2 - y1)) / (1300 * 1000)) * 150, 50))
+# Grab new img
+# img = pyautogui.screenshot(region=(310, 30, 1000, 1300))
+# # img.show()
+# img = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+# # cv2.imwrite('zeromph.png', img)
+#
     crop = img[shape[1]:shape[1] + zero_mph.shape[0], shape[0]:shape[0] + zero_mph.shape[1]]
 
     # Chroma key
@@ -65,7 +78,7 @@ while True:
     crop_copy = cv2.cvtColor(crop_copy, cv2.COLOR_BGR2GRAY)
     com_copy = cv2.cvtColor(com_copy, cv2.COLOR_BGR2GRAY)
 
-    if compare_ssim(com_copy, crop_copy) > 0.95:  # 0.858
+    if compare_ssim(com_copy, crop_copy) > 0.949:  # 0.858
         print(compare_ssim(com_copy, crop_copy))
 
 # Do masking

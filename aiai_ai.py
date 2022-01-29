@@ -52,7 +52,7 @@ def interpret_and_act(img, x_input, y_input, st, g_max):
         x1, y1, x2, y2, prob, _ = results[0]
         if prob > 0.55:
             x1, y1, x2, y2 = float(x1), float(y1), float(x2), float(y2)
-            g = min((((x2 - x1) * (y2 - y1)) / (width * height)) * 150, 50)  # TODO Adjust goal size weight
+            g = min((((x2 - x1) * (y2 - y1)) / (width * height)) * 125, 50)
             if g > g_max:
                 g_max = g
 
@@ -75,7 +75,7 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
         p = pop
     net = neat.nn.recurrent.RecurrentNetwork.create(genome, cfg)
 
-    time.sleep(1.85)
+    time.sleep(2)  # Allow time to load up
 
     current_max_fitness, g_max, step, zero_step, done = 0, 0, 0, 0, False
 

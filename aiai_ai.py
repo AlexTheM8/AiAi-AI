@@ -75,7 +75,10 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
         p = pop
     net = neat.nn.recurrent.RecurrentNetwork.create(genome, cfg)
 
-    time.sleep(2)  # Allow time to load up
+    # TODO Review "fix"
+    img = get_img()
+    time.sleep(2.5)  # Allow time to load up
+    img = get_img()
 
     current_max_fitness, g_max, step, zero_step, done = 0, 0, 0, 0, False
 

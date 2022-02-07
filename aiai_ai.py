@@ -1,6 +1,6 @@
 import os
 import pickle
-import time
+from time import perf_counter, sleep, strftime, localtime
 import warnings
 from functools import partial
 
@@ -16,7 +16,7 @@ from controller import Controller
 
 
 def get_ts():
-    return time.strftime("%H:%M:%S", time.localtime())
+    return strftime("%H:%M:%S", localtime())
 
 
 def get_img():
@@ -41,11 +41,9 @@ def img_similarity(img, compare, shape, threshold=0.75):
     return compare_ssim(com_copy, crop_copy) > threshold
 
 
-def interpret_and_act(img, x_input, y_input, st, g_max):
-    done, info = False, ''
-
-    controller.do_movement(x_input, y_input)
-
+# TODO Bottle neck
+def detect_goal(img):
+    g = -25
     ref = model(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), size=640)
     results = ref.xyxy[0]
     if len(results) > 0:
@@ -53,8 +51,15 @@ def interpret_and_act(img, x_input, y_input, st, g_max):
         if prob > 0.55:
             x1, y1, x2, y2 = float(x1), float(y1), float(x2), float(y2)
             g = min((((x2 - x1) * (y2 - y1)) / (width * height)) * 125, 50)
-            if g > g_max:
-                g_max = g
+    return g
+
+
+def interpret_and_act(img, x_input, y_input, st, g_max):
+    done, info = False, ''
+
+    controller.do_movement(x_input, y_input)
+
+    g_max = max(g_max, detect_goal(img))
 
     if img_similarity(img, time_over, to_shape):
         g_max -= 25  # [-25, 25]
@@ -63,7 +68,7 @@ def interpret_and_act(img, x_input, y_input, st, g_max):
         g_max -= 50  # [-50, 0]
         done, info = True, 'Fall Out'
     elif img_similarity(img, goal, g_shape):
-        g_max = 30 + (1.25 * (60 - (time.time() - st)))  # [30, 105]
+        g_max = 30 + (1.25 * (60 - (perf_counter() - st)))  # [30, 105]
         done, info = True, 'Goal'
 
     return g_max, done, info
@@ -75,15 +80,15 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
         p = pop
     net = neat.nn.recurrent.RecurrentNetwork.create(genome, cfg)
 
-    time.sleep(2.5)  # Allow time to load up
+    sleep(2.5)  # Allow time to load up
 
     current_max_fitness, g_max, step, zero_step, done = 0, 0, 0, 0, False
 
     controller.load_state()
     print(f'{get_ts()}: INFO: running genome {genome_id} in generation {p.generation}')
-    st = time.time()
+    st = perf_counter()
     while not done:
-        # TODO Consistent intervals (investigate further)
+        # TODO Consistent intervals (investigate further) or pause during comp
         # get next image
         img = get_img()
 
@@ -114,6 +119,7 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
                 g_max -= 25
             print(f'{get_ts()}: INFO: generation: {p.generation}, genome: {genome_id}, fitness: {g_max}')
         genome.fitness = g_max
+        print(perf_counter() - st)
     controller.do_movement(0, 0)  # Reset movement
     return genome.fitness
 
@@ -126,7 +132,7 @@ def update_stats(gen, sr, file='stats.csv'):
 
 def eval_genomes(genomes, cfg):
     if len(stat_reporter.get_fitness_mean()) > 0:
-        update_stats(p.generation-1, stat_reporter)
+        update_stats(p.generation - 1, stat_reporter)
     max_fit = -50
     for genome_id, genome in genomes:
         fit = conduct_genome(genome, cfg, genome_id)
@@ -166,6 +172,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 model = hub.load('yolov5', 'custom', 'yolov5/runs/train/exp/weights/best.pt', source='local')
 
 max_steps = 500
+max_fitness = {}
 
 if __name__ == '__main__':
     # TODO Flag for logging (options={full, partial, none} where partial includes stdout & non-timeouts)
@@ -187,8 +194,6 @@ if __name__ == '__main__':
     stat_reporter = neat.StatisticsReporter()
     p.add_reporter(stat_reporter)
     p.add_reporter(checkpointer)
-
-    max_fitness = {}
 
     # Final
     winner = p.run(eval_genomes)

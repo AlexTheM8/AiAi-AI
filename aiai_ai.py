@@ -34,7 +34,7 @@ def create_logger(option):
         console_handle = logging.StreamHandler()
         console_handle.setLevel(logging.DEBUG)
 
-        log_format = logging.Formatter('%(levelname)s: %(message)s')
+        log_format = logging.Formatter('%(asctime)s %(levelname)s: %(message)s', datefmt='%H:%M:%S')
         console_handle.setFormatter(log_format)
 
         log.addHandler(console_handle)
@@ -66,11 +66,11 @@ def img_similarity(img, compare, shape, threshold=0.75):
 # TODO Bottle neck
 def detect_goal(img):
     g = -25
-    ref = model(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), size=640)
+    ref = model(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), size=320)
     results = ref.xyxy[0]
     if len(results) > 0:
         x1, y1, x2, y2, prob, _ = results[0]
-        if prob > 0.55:
+        if prob > 0.4:
             x1, y1, x2, y2 = float(x1), float(y1), float(x2), float(y2)
             g = min((((x2 - x1) * (y2 - y1)) / (width * height)) * 125, 50)
     return g

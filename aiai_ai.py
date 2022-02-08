@@ -1,13 +1,16 @@
-import os
-import pickle
-from time import perf_counter, sleep, strftime, localtime
-import warnings
+from enum import Enum
+import logging
+from optparse import OptionParser
+from os import listdir
+from pickle import dump
+from time import perf_counter, sleep
+from warnings import filterwarnings
 from functools import partial
 
 import cv2
 import neat
 import numpy as np
-import pyautogui
+from pyautogui import screenshot
 from PIL import ImageGrab
 from skimage.metrics import structural_similarity as compare_ssim
 from torch import hub
@@ -15,12 +18,31 @@ from torch import hub
 from controller import Controller
 
 
-def get_ts():
-    return strftime("%H:%M:%S", localtime())
+class LogOptions(Enum):
+    FULL = 'full'
+    PARTIAL = 'partial'
+    NONE = 'none'
+
+
+def create_logger(option):
+    log = logging.getLogger("Aiai_AI")
+    log.handlers.clear()
+    log.setLevel(logging.DEBUG)
+    log.propagate = False
+
+    if option != LogOptions.NONE:
+        console_handle = logging.StreamHandler()
+        console_handle.setLevel(logging.DEBUG)
+
+        log_format = logging.Formatter('%(levelname)s: %(message)s')
+        console_handle.setFormatter(log_format)
+
+        log.addHandler(console_handle)
+    return log
 
 
 def get_img():
-    img = pyautogui.screenshot(region=(x_pad, y_pad, width, height))
+    img = screenshot(region=(x_pad, y_pad, width, height))
     return cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
 
@@ -76,8 +98,9 @@ def interpret_and_act(img, x_input, y_input, st, g_max):
 
 def conduct_genome(genome, cfg, genome_id, pop=None):
     global p
-    if pop is not None:
-        p = pop
+
+    p = p if pop is None else pop
+
     net = neat.nn.recurrent.RecurrentNetwork.create(genome, cfg)
 
     sleep(2.5)  # Allow time to load up
@@ -85,7 +108,8 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
     current_max_fitness, g_max, step, zero_step, done = 0, 0, 0, 0, False
 
     controller.load_state()
-    print(f'{get_ts()}: INFO: running genome {genome_id} in generation {p.generation}')
+    if options.logging == LogOptions.FULL:
+        logger.info(f'running genome {genome_id} in generation {p.generation}')
     st = perf_counter()
     while not done:
         # TODO Consistent intervals (investigate further) or pause during comp
@@ -101,8 +125,9 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
         x_input, y_input = net.activate(img_array)
 
         g_max, done, info = interpret_and_act(img, x_input, y_input, st, g_max)
-        if info != '':
-            print(f'{get_ts()}: {info}')
+
+        if info != '' and options.logging == LogOptions.FULL:
+            logger.info(f'{info}')
 
         if g_max > current_max_fitness:
             current_max_fitness = g_max
@@ -115,11 +140,11 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
         if done or step > max_steps or zero_step > max_steps:
             done = True
             if step > max_steps or zero_step > max_steps:
-                print(f'{get_ts()}: INFO: Timed out due to stagnation')
+                if options.logging == LogOptions.FULL:
+                    logger.info('Timed out due to stagnation')
                 g_max -= 25
-            print(f'{get_ts()}: INFO: generation: {p.generation}, genome: {genome_id}, fitness: {g_max}')
+            logger.info(f'generation: {p.generation}, genome: {genome_id}, fitness: {g_max}')
         genome.fitness = g_max
-        print(perf_counter() - st)
     controller.do_movement(0, 0)  # Reset movement
     return genome.fitness
 
@@ -131,7 +156,7 @@ def update_stats(gen, sr, file='stats.csv'):
 
 
 def eval_genomes(genomes, cfg):
-    if len(stat_reporter.get_fitness_mean()) > 0:
+    if len(stat_reporter.get_fitness_mean()) > 0 and options.stats:
         update_stats(p.generation - 1, stat_reporter)
     max_fit = -50
     for genome_id, genome in genomes:
@@ -167,26 +192,34 @@ zm_x_pad, zm_y_pad = 410, 880
 zm_shape = (zm_x_pad - x_pad, zm_y_pad - y_pad)
 
 # Goal detection
-warnings.filterwarnings("ignore", category=UserWarning)
-warnings.filterwarnings("ignore", category=RuntimeWarning)
+filterwarnings("ignore", category=UserWarning)
+filterwarnings("ignore", category=RuntimeWarning)
 model = hub.load('yolov5', 'custom', 'yolov5/runs/train/exp/weights/best.pt', source='local')
 
 max_steps = 500
 max_fitness = {}
 
 if __name__ == '__main__':
-    # TODO Flag for logging (options={full, partial, none} where partial includes stdout & non-timeouts)
-    # TODO Flag for stat-saving
+    parser = OptionParser()
+
+    parser.add_option('-l', '--logging', dest='logging', choices=[o for o in LogOptions],
+                      help='Logging options: [full, partial, none]. (Default=full)', default=LogOptions.FULL)
+    parser.add_option('-s', '--stats', dest='stats', help='Argument for saving evolution stats. (Default=true)',
+                      action='store_true', default=True)
+
+    options, args = parser.parse_args()
+
+    logger = create_logger(options.logging)
 
     # Network setup
     checkpointer = neat.Checkpointer(generation_interval=1, filename_prefix='history/neat-checkpoint-')
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation,
                          'config-feedforward')
-    if len(os.listdir('history')) > 0:
-        m = max([int(f[f.rfind('-') + 1:]) for f in os.listdir('history')])
+    if len(listdir('history')) > 0:
+        m = max([int(f[f.rfind('-') + 1:]) for f in listdir('history')])
         p = checkpointer.restore_checkpoint(f'history/neat-checkpoint-{m}')
         p.generation += 1
-        print(f'{get_ts()}: Restoring checkpoint {m}')
+        logger.info(f'Restoring checkpoint {m}')
         p.config = config
     else:
         p = neat.Population(config)
@@ -199,4 +232,4 @@ if __name__ == '__main__':
     winner = p.run(eval_genomes)
 
     with open('winner.pkl', 'wb') as output:
-        pickle.dump(winner, output, 1)
+        dump(winner, output, 1)

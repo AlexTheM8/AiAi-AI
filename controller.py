@@ -1,3 +1,4 @@
+from functools import lru_cache
 from random import uniform
 from time import sleep
 
@@ -29,6 +30,7 @@ class Controller:
         sleep(0.01)
 
 
+@lru_cache(maxsize=2**10)
 def clamp(n, minimum=-1.0, maximum=1.0):
     # TODO Return to this
     if n > maximum:

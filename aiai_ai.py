@@ -70,7 +70,7 @@ def detect_goal(img):
     results = ref.xyxy[0]
     if len(results) > 0:
         x1, y1, x2, y2, prob, _ = results[0]
-        if prob > 0.4:
+        if prob > 0.45:
             x1, y1, x2, y2 = float(x1), float(y1), float(x2), float(y2)
             g = min((((x2 - x1) * (y2 - y1)) / (width * height)) * 125, 50)
     return g
@@ -83,6 +83,7 @@ def interpret_and_act(img, x_input, y_input, st, g_max):
 
     g_max = max(g_max, detect_goal(img))
 
+    # TODO Multi-thread these checks? Potential 0.02sec time save
     if img_similarity(img, time_over, to_shape):
         g_max -= 25  # [-25, 25]
         done, info = True, 'Time Over'
@@ -111,7 +112,9 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
     if options.logging == LogOptions.FULL:
         logger.info(f'running genome {genome_id} in generation {p.generation}')
     st = perf_counter()
+    # step_list = np.array([])
     while not done:
+        # step_time = perf_counter()
         # TODO Consistent intervals (investigate further) or pause during comp
         # get next image
         img = get_img()
@@ -137,15 +140,17 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
         else:
             step += 1
             zero_step = 0
-        if done or step > max_steps or zero_step > max_steps:
+        if not done and (step > max_steps or zero_step > max_steps):
             done = True
             if step > max_steps or zero_step > max_steps:
                 if options.logging == LogOptions.FULL:
                     logger.info('Timed out due to stagnation')
                 g_max -= 25
-            logger.info(f'generation: {p.generation}, genome: {genome_id}, fitness: {g_max}')
         genome.fitness = g_max
+        # step_list = np.append(step_list, perf_counter() - step_time)
+    logger.info(f'generation: {p.generation}, genome: {genome_id}, fitness: {genome.fitness}')
     controller.do_movement(0, 0)  # Reset movement
+    # logger.info(np.average(step_list))
     return genome.fitness
 
 

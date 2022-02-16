@@ -1,17 +1,17 @@
-from enum import Enum
 import logging
+from enum import Enum
+from functools import partial
 from optparse import OptionParser
 from os import listdir
 from pickle import dump
 from time import perf_counter, sleep
 from warnings import filterwarnings
-from functools import partial
 
 import cv2
 import neat
 import numpy as np
-from pyautogui import screenshot
 from PIL import ImageGrab
+from pyautogui import screenshot
 from skimage.metrics import structural_similarity as compare_ssim
 from torch import hub
 
@@ -81,9 +81,6 @@ def interpret_and_act(img, x_input, y_input, st, g_max):
 
     controller.do_movement(x_input, y_input)
 
-    g_max = max(g_max, detect_goal(img))
-
-    # TODO Multi-thread these checks? Potential 0.02sec time save
     if img_similarity(img, time_over, to_shape):
         g_max -= 25  # [-25, 25]
         done, info = True, 'Time Over'
@@ -93,6 +90,9 @@ def interpret_and_act(img, x_input, y_input, st, g_max):
     elif img_similarity(img, goal, g_shape):
         g_max = 30 + (1.25 * (60 - (perf_counter() - st)))  # [30, 105]
         done, info = True, 'Goal'
+
+    if not done:
+        g_max = max(g_max, detect_goal(img))
 
     return g_max, done, info
 

@@ -70,7 +70,7 @@ def detect_goal(img):
     results = ref.xyxy[0]
     if len(results) > 0:
         x1, y1, x2, y2, prob, _ = results[0]
-        if prob > 0.45:
+        if prob > 0.81:
             x1, y1, x2, y2 = float(x1), float(y1), float(x2), float(y2)
             g = min((((x2 - x1) * (y2 - y1)) / (width * height)) * 125, 50)
     return g
@@ -81,6 +81,7 @@ def interpret_and_act(img, x_input, y_input, st, g_max):
 
     controller.do_movement(x_input, y_input)
 
+    # TODO Parallelize
     if img_similarity(img, time_over, to_shape):
         g_max -= 25  # [-25, 25]
         done, info = True, 'Time Over'
@@ -135,8 +136,10 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
         if g_max > current_max_fitness:
             current_max_fitness = g_max
             step, zero_step = 0, 0
-        elif img_similarity(img, zero_mph, zm_shape, threshold=0.94):
-            zero_step += 60
+        # TODO Review threshold
+        elif options.zero_kill:
+            if img_similarity(img, zero_mph, zm_shape, threshold=0.94):
+                zero_step += 60
         else:
             step += 1
             zero_step = 0
@@ -211,6 +214,8 @@ if __name__ == '__main__':
                       help='Logging options: [full, partial, none]. (Default=full)', default=LogOptions.FULL)
     parser.add_option('-s', '--stats', dest='stats', help='Argument for saving evolution stats. (Default=true)',
                       action='store_true', default=True)
+    parser.add_option('-z', '--zero_kill', dest='zero_kill',
+                      help='Argument for killing genome at 0mph. (Default=true)', action='store_true', default=True)
 
     options, args = parser.parse_args()
 

@@ -1,7 +1,7 @@
 [NEAT]
 fitness_criterion     = max
 # Review threshold (Might find true theoretical max)
-fitness_threshold     = 105
+fitness_threshold     = 90
 pop_size              = 60
 reset_on_extinction   = False
 

@@ -3,16 +3,16 @@ Super Monkey Ball AI using NEAT and YOLO
 ![SMB Logo](./docs/SMB_series_logo_transparent.png)
 
 ## Contents
-1. [Project Description](#ProjectDescription)
-    1. [Technologies Used](#Technologies Used)
-1. [Inspiration & Purpose](#Inspiration And Purpose)
+1. [Project Description](#Project-Description)
+    1. [Technologies Used](#Technologies-Used)
+1. [Inspiration & Purpose](#Inspiration-And-Purpose)
 1. [Results](#Results)
-    1. [Hardware Specs](#Hardware Specs)
+    1. [Hardware Specs](#Hardware-Specs)
     1. [Graphs](#Graphs)
-1. [How To Use](#How To Use)
-    1. [Customizing Options](#Customizing Options)
-    1. [Known Issues](#Known Issues)
-1. [Future Work](#Future Work)
+1. [How To Use](#How-To-Use)
+    1. [Customizing Options](#Customizing-Options)
+    1. [Known Issues](#Known-Issues)
+1. [Future Work](#Future-Work)
 
 ## Project Description
 This repository contains the excessive work completed in an attempt to create an artificial intelligence agent in the game *Super Monkey Ball*.

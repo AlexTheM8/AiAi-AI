@@ -3,7 +3,7 @@ Super Monkey Ball AI using NEAT and YOLO
 ![SMB Logo](./docs/SMB_series_logo_transparent.png)
 
 ## Contents
-1. [Project Description](#Project Description)
+1. [Project Description](#ProjectDescription)
     1. [Technologies Used](#Technologies Used)
 1. [Inspiration & Purpose](#Inspiration And Purpose)
 1. [Results](#Results)

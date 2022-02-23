@@ -2,7 +2,7 @@ import logging
 from enum import Enum
 from functools import partial
 from optparse import OptionParser
-from os import listdir
+from os import listdir, mkdir, path
 from pickle import dump
 from time import perf_counter, sleep
 from warnings import filterwarnings
@@ -222,12 +222,15 @@ if __name__ == '__main__':
     logger = create_logger(options.logging)
 
     # Network setup
-    checkpointer = neat.Checkpointer(generation_interval=1, filename_prefix='history/neat-checkpoint-')
+    hist_path = 'history'
+    checkpointer = neat.Checkpointer(generation_interval=1, filename_prefix=f'{hist_path}/neat-checkpoint-')
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation,
                          'config-feedforward')
-    if len(listdir('history')) > 0:
-        m = max([int(f[f.rfind('-') + 1:]) for f in listdir('history')])
-        p = checkpointer.restore_checkpoint(f'history/neat-checkpoint-{m}')
+    if not path.isdir(hist_path):
+        mkdir(hist_path)
+    if len(listdir(hist_path)) > 0:
+        m = max([int(f[f.rfind('-') + 1:]) for f in listdir(hist_path)])
+        p = checkpointer.restore_checkpoint(f'{hist_path}/neat-checkpoint-{m}')
         p.generation += 1
         logger.info(f'Restoring checkpoint {m}')
         p.config = config

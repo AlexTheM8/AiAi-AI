@@ -98,7 +98,7 @@ python controller.py
 
 This will set the controller to repeatedly press the virtual button designated to loading the game's state. Back in the Dolphin hotkeys menu, at the `Device` dropdown, select the virtual gamepad (multiple devices may be listed, so repeat the following steps until the correct device is found). The click on the Load State Slot N (where N can be any number you choose) box and wait for `Button 3` to appear in the box (repeat a few times if it does not appear immediately). You should then see `Button 3` flash bold multiple times. The `controller.py` process can now be terminated.
 
-![dolphin_hotkey_config](./docs/dolphin_hotkey_config.PNG)
+![dolphin_hotkey_config](./docs/dolphin_hotkey_config.png)
 
 ### Controller Config
 For the joystick controls, navigate to the Dolphin controller config menu.

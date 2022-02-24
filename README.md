@@ -10,7 +10,15 @@ Super Monkey Ball AI using NEAT and YOLO
     1. [Hardware Specs](#Hardware-Specs)
     1. [Graphs](#Graphs)
 1. [How To Use](#How-To-Use)
+    1. [Requirements](#requirements)
+    1. [Hotkey Config](#hotkey-config)
+    1. [Controller Config](#controller-config)
+    1. [Save State Setup](#save-state-setup)
+    1. [Launch AI Agent](#launch-ai-agent)
     1. [Customizing Options](#Customizing-Options)
+        1. [Logging & Stats](#logging--stats)
+        1. [Network](#network)
+        1. [Goal Detection](#goal-detection)
     1. [Known Issues](#Known-Issues)
 1. [Future Work](#Future-Work)
 
@@ -23,7 +31,7 @@ This project utilizes two technologies: [NEAT](https://github.com/CodeReclaimers
 #### NEAT
 NEAT (Neural Evolution of Augmented Topologies) is the primary mechanism utilized in this projects. To facilitate the evolution, the `aiai_ai.py` script runs the `neat-python` library. After a genome is initialized, a screenshot is taken at each interval in the script. This screenshot is then analyzed by the generated model and an action is determined accordingly. To determine the resulting state's fitness, the screenshot is evaluated to see if it is one of three states `[TIME OVER, FALL OUT, GOAL]`.
 
-TODO ADD IMAGES
+![all_states](./docs/all_states.png)
 
 In the `GOAL` state, the genome's fitness is determined by how quickly it reached the Goal, based on the following equation: `30 + 1.25 * time_remaining` where the fitness of the `GOAL` state is between `[30, 105]`.
 
@@ -58,7 +66,75 @@ TODO
 TODO
 
 ## How To Use
-TODO
+To utilize this project, be sure to have a working version of the [Dolphin Emulator](https://dolphin-emu.org) installed on your machine, along with a ROM of [Super Monkey Ball for GameCube](https://en.wikipedia.org/wiki/Super_Monkey_Ball_(video_game)). The project can be downloaded onto your local machine using the following command:
+
+```
+git clone https://github.com/AlexTheM8/AiAi-AI.git
+```
+
+### Requirements
+The code of this project was programmed using `Python 3.9.0`. It is currently unknown if this project is functional in any other Python version.
+
+Once downloaded, navigate into the project folder and execute the following command to install the Python dependency libraries:
+
+```
+pip install -r requirements.txt
+```
+
+If necessary, additional requirements can be installed by executing the following command:
+
+```
+pip install -r ./yolov5/requirements.txt
+```
+
+### Hotkey Config
+Prior to executing the program, the virtual gamepad needs to be initialized. To do so, the `controller.py` must be configured executed. Pulling up the Dolphin hotkey controls, navigate to the `Save and Load State` tab (see below). Once there, execute the following command:
+
+```
+python controller.py
+```
+
+![dolphin_hotkey_default](./docs/dolphin_hotkey_default.PNG)
+
+This will set the controller to repeatedly press the virtual button designated to loading the game's state. Back in the Dolphin hotkeys menu, at the `Device` dropdown, select the virtual gamepad (multiple devices may be listed, so repeat the following steps until the correct device is found). The click on the Load State Slot N (where N can be any number you choose) box and wait for `Button 3` to appear in the box (repeat a few times if it does not appear immediately). You should then see `Button 3` flash bold multiple times. The `controller.py` process can now be terminated.
+
+![dolphin_hotkey_config](./docs/dolphin_hotkey_config.PNG)
+
+### Controller Config
+For the joystick controls, navigate to the Dolphin controller config menu.
+
+![dolphin_controls_default](./docs/dolphin_controls_default.PNG)
+
+In the `controller.py` code, replace each instance of `load_state()` with `do_movement(0, 0)` in the following lines of code:
+
+```
+if __name__ == "__main__":
+    controller = Controller()
+    sleep(0.1)
+    controller.load_state()
+    while True:
+        controller.load_state()
+```
+
+For each direction `[UP, DOWN, LEFT, RIGHT]`, set the `do_movement` parameters to `[(0, 1), (0, -1), (-1, 0), (1, 0)]`, respectively and run the `controller.py` program, following similar steps found in [Hotkey Config](#hotkey-config). To test if the joystick is configured correctly, replace the `do_movement` (previously `load_state`) with `random_movement` and observe that the virtual joystick is moving appropriately.
+
+Here is an example configuration (specifically focusing on Control Stick Up, Down, Left, and Right).
+
+![dolphin_controls_config](./docs/dolphin_controls_config.png)
+
+### Save State Setup
+The evolution process requires a save state to be accessible as this is how the agent resets the game state upon starting a new genome. Please refer to [Hotkey Config](#hotkey-config) before configuring the save state. In the *Super Monkey Ball* game, navigate to the preferred stage (**Note**: if you are just starting out the game and do not want to play through the game to access later stages, please refer to [this Wiki](https://tcrf.net/Super_Monkey_Ball_(GameCube)#Debug_Mode) for more information on how to access all levels easily). Save the game state at the start of the stage (before any time passes) in the same `Save Slot` chosen in the [Hotkey Config](#hotkey-config) step (**Note**: for a more-precise save state, use the frame-advance TAS tools provided by Dolphin). Feel free to use the original code in `controller.py` to test if the save state (and corresponding hotkey) are configured appropriately (see [Hotkey Config](#hotkey-config)).
+
+**NOTE: For all hotkey & controller settings, it is strongly recommended to save the controls as a Profile in Dolphin to reduce repeated steps in the future**
+
+### Launch AI Agent
+Once all the previous steps are completed, launch the *Super Monkey Ball* ROM on Dolphin and execute the following command:
+
+```
+python aiai_ai
+```
+
+From there, you should see the program load up the save state and begin evolution!
 
 ### Customizing Options
 To customize behavior, there are some options and features available in the AiAi AI. These options include logging and stat-tracking as well as network customization options.

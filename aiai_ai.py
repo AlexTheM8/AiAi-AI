@@ -73,8 +73,8 @@ def detect_goal(img):
         if prob > 0.84:
             x1, y1, x2, y2 = float(x1), float(y1), float(x2), float(y2)
             g = min((((x2 - x1) * (y2 - y1)) / (width * height)) * 125, 50)
-            # if g > 30:
-            logger.info(f'prob: {prob}, g: {g}')
+            if g > 30:
+                logger.info(f'prob: {prob}, g: {g}')
     return g
 
 

@@ -16,3 +16,4 @@ PyAutoGUI==0.9.52
 scikit-image==0.18.1
 vgamepad==0.0.6
 neat-python==0.92
+mss==6.1.0

@@ -40,7 +40,6 @@ def create_logger(option):
 
 
 def get_img():
-    # img = screenshot(region=(x_pad, y_pad, width, height))
     img = np.array(sct().grab(monitor))
     return cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
@@ -178,7 +177,6 @@ def eval_genomes(genomes, cfg):
 controller = Controller()
 
 # Image setup
-# ImageGrab.grab = partial(ImageGrab.grab, all_screens=True)
 width, height, x_pad, y_pad, scale = 1300, 1000, 310, 30, 25
 mon = sct().monitors[2]
 monitor = {"top": mon["top"] + y_pad, "left": mon["left"] + x_pad, "width": width, "height": height}

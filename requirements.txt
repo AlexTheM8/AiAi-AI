@@ -12,8 +12,8 @@ requests==2.27.1
 Flask==1.1.2
 thop==0.0.31.post2005241907
 tensorflow==2.7.0
-PyAutoGUI==0.9.52
 scikit-image==0.18.1
 vgamepad==0.0.6
 neat-python==0.92
 mss==6.1.0
+pywin32==300

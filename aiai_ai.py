@@ -187,6 +187,7 @@ controller = Controller()
 # Image setup
 window, width, height = None, 0, 0
 win32gui.EnumWindows(enumHandler, None)
+# TODO Examine this solution and see if it can be generalized/set as an argument
 if window is not None:
     border_x, border_y = 9, 39
     x_pad, y_pad, width, height = win32gui.GetWindowRect(window)

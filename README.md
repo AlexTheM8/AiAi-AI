@@ -10,6 +10,7 @@ Super Monkey Ball AI using NEAT and YOLO
     1. [Hardware Specs](#Hardware-Specs)
     1. [Graphs](#Graphs)
 1. [How To Use](#How-To-Use)
+    1. [Dolphin Emulation Config](#dolphin-emulation-config)
     1. [Requirements](#requirements)
     1. [Hotkey Config](#hotkey-config)
     1. [Controller Config](#controller-config)
@@ -72,6 +73,9 @@ To utilize this project, be sure to have a working version of the [Dolphin Emula
 git clone https://github.com/AlexTheM8/AiAi-AI.git
 ```
 
+### Dolphin Emulation Config
+TODO 
+
 ### Requirements
 The code of this project was programmed using `Python 3.9.0`. It is currently unknown if this project is functional in any other Python version.
 
@@ -87,16 +91,45 @@ If necessary, additional requirements can be installed by executing the followin
 pip install -r ./yolov5/requirements.txt
 ```
 
+<details>
+  <summary><b>Additional instructions for CUDA-enabled devices</b></summary>
+  
+  If you are running a CUDA-enabled device, execute the following command:
+  
+  (For CUDA 10.2)
+  ```
+pip install torch==1.10.2+cu102 torchvision==0.11.3+cu102 torchaudio===0.10.2+cu102 -f https://download.pytorch.org/whl/cu102/torch_stable.html
+  ```
+  
+  (For CUDA 11.3)
+  
+  ```
+pip install torch==1.10.2+cu113 torchvision==0.11.3+cu113 torchaudio===0.10.2+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
+  ```
+</details>
+
 ### Hotkey Config
-Prior to executing the program, the virtual gamepad needs to be initialized. To do so, the `controller.py` must be configured executed. Pulling up the Dolphin hotkey controls, navigate to the `Save and Load State` tab (see below). Once there, execute the following command:
+Prior to executing the program, the virtual gamepad needs to be initialized. To do so, the `controller.py` must be configured executed.
+
+Pulling up the Dolphin hotkey controls, navigate to the `Save and Load State` tab (see below). 
+
+![dolphin_hotkey_default](./docs/dolphin_hotkey_default.PNG)
+
+Once there, execute the following command:
 
 ```
 python controller.py
 ```
 
-![dolphin_hotkey_default](./docs/dolphin_hotkey_default.PNG)
-
-This will set the controller to repeatedly press the virtual button designated to loading the game's state. Back in the Dolphin hotkeys menu, at the `Device` dropdown, select the virtual gamepad (multiple devices may be listed, so repeat the following steps until the correct device is found). The click on the Load State Slot N (where N can be any number you choose) box and wait for `Button 3` to appear in the box (repeat a few times if it does not appear immediately). You should then see `Button 3` flash bold multiple times. The `controller.py` process can now be terminated.
+This will set the controller to repeatedly press the virtual button designated to loading the game's state. Follow these steps to configure the `Load State` hotkey.
+ 
+1. In the Dolphin hotkeys menu, at the `Device` dropdown, select the virtual gamepad (multiple devices may be listed, so repeat steps 2-4 with a different device until the correct device is found)
+1. Click on the `Load State Slot N` (where N can be any number you choose. **Remember this number**) box
+1. Wait for `Button 3` to appear in the box
+1. Repeat steps 2 & 3 a few times if it does not appear immediately
+1. You should then see `Button 3` flash bold multiple times
+1. Terminate the `controller.py` process
+1. **[OPTIONAL]** Save the configuration as a `Profile` in Dolphin to avoid the need to repeat this process in the future
 
 ![dolphin_hotkey_config](./docs/dolphin_hotkey_config.png)
 
@@ -105,27 +138,38 @@ For the joystick controls, navigate to the Dolphin controller config menu.
 
 ![dolphin_controls_default](./docs/dolphin_controls_default.PNG)
 
-In the `controller.py` code, replace each instance of `load_state()` with `do_movement(0, 0)` in the following lines of code:
+In the `controller.py` code, you will see the following code block at the end of the script:
 
 ```
 if __name__ == "__main__":
     controller = Controller()
     sleep(0.1)
-    controller.load_state()
     while True:
         controller.load_state()
 ```
 
-For each direction `[UP, DOWN, LEFT, RIGHT]`, set the `do_movement` parameters to `[(0, 1), (0, -1), (-1, 0), (1, 0)]`, respectively and run the `controller.py` program, following similar steps found in [Hotkey Config](#hotkey-config). To test if the joystick is configured correctly, replace the `do_movement` (previously `load_state`) with `random_movement` and observe that the virtual joystick is moving appropriately.
+To configure the joystick in Dolphin, follow these steps:
 
-Here is an example configuration (specifically focusing on Control Stick Up, Down, Left, and Right).
+1. Replace `controller.load_state()` with `controller.setup_UP()`
+1. Execute the command `python controller.py`
+1. In the Dolphin controller config menu, select the `Device` corresponding to the virtual gamepad (as described in [Hotkey Config](#hotkey-config), the device is not universally labeled, so steps 4-6 may need to be repeated until device is found)
+1. Under the `Control Stick` section, click the box next to `Up`
+1. Wait for `Up` to appear in the box
+1. Repeat steps 4 & 5 a few times if it does not appear immediately
+1. You should then see `Up` flash bold multiple times along with a visual representation of the joystick moving in the visual above
+1. Terminate the `controller.py` process
+1. Repeats steps 1-8 for each of the directions `[DOWN, LEFT, RIGHT]`, replacing each instance of "Up" with the corresponding direction
+1. **[OPTIONAL]** Save the configuration as a `Profile` in Dolphin to avoid the need to repeat this process in the future
+1. **[OPTIONAL]** To test the controller configuration, replace the edited section with `controller.random_movement()` and execute the script. The virtual joystick should be moving appropriately
 
 ![dolphin_controls_config](./docs/dolphin_controls_config.png)
 
 ### Save State Setup
-The evolution process requires a save state to be accessible as this is how the agent resets the game state upon starting a new genome. Please refer to [Hotkey Config](#hotkey-config) before configuring the save state. In the *Super Monkey Ball* game, navigate to the preferred stage (**Note**: if you are just starting out the game and do not want to play through the game to access later stages, please refer to [this Wiki](https://tcrf.net/Super_Monkey_Ball_(GameCube)#Debug_Mode) for more information on how to access all levels easily). Save the game state at the start of the stage (before any time passes) in the same `Save Slot` chosen in the [Hotkey Config](#hotkey-config) step (**Note**: for a more-precise save state, use the frame-advance TAS tools provided by Dolphin). Feel free to use the original code in `controller.py` to test if the save state (and corresponding hotkey) are configured appropriately (see [Hotkey Config](#hotkey-config)).
+The evolution process requires a save state to be accessible as this is how the agent resets the game state upon starting a new genome. Please refer to [Hotkey Config](#hotkey-config) before configuring the save state. 
 
-**NOTE: For all hotkey & controller settings, it is strongly recommended to save the controls as a Profile in Dolphin to reduce repeated steps in the future**
+1. In the *Super Monkey Ball* game, navigate to the preferred stage (**Note**: if you are just starting out the game and do not want to play through the game to access later stages, please refer to [this Wiki](https://tcrf.net/Super_Monkey_Ball_(GameCube)#Debug_Mode) for more information on how to access all levels easily)
+1. Save the game state at the start of the stage (before any time passes) in the same `Save Slot` chosen in the [Hotkey Config](#hotkey-config) step (**Note**: for a more-precise save state, use the frame-advance TAS tools provided by Dolphin)
+1. Feel free to use the original code in `controller.py` to test if the save state (and corresponding hotkey) are configured appropriately (see [Hotkey Config](#hotkey-config)).
 
 ### Launch AI Agent
 Once all the previous steps are completed, launch the *Super Monkey Ball* ROM on Dolphin and execute the following command:
@@ -192,11 +236,3 @@ Below is a list of known issues with the current project.
 - In the `neat-python` library, there is an occasional issue with population reproduction after a species stagnates where an assert with the `node_dict` will fail. This is due to a naive assert check for the stored indexer. The fix can be found on the `Revisions` branch of [my personal fork of the library](https://github.com/AlexTheM8/neat-python), which can be pulled and installed locally.
 - Another minor issue with the `neat-python` library is that the `Checkpoint` feature does not save the best genome after each generation. Whether this is an intentional design is debatable. However, this requires the user to specify a fitness threshold for the system to exceed to consider it a "solved" problem. In the design of this project, a stage-specific max fitness was not intended. Instead, it was largely expected for the evolution to find the best potential solution before stagnating and going extinct. This issue can be resolved by either setting an expected max fitness, or by utilizing the changes on the `Revisions` branch of [my personal fork of the library](https://github.com/AlexTheM8/neat-python).
 - The 0mph genome time-out feature is not always effective at timing out a genome, but still helps at filtering out zero-movement genomes.
-
-## Future Work
-Assuming I do continue this project in the future, here are somethings I'd like to improve upon:
-
-- Improve hardware & language. Let's be honest, the poor results I got are mostly due to running solely on CPU and programming in Python. I need money for an NVIDIA GPU and knowledge for C/C++
-- Tying into C/C++ programming, building a hook into Dolphin directly will likely greatly improve results
-
-If you have suggestions on how to improve this project or notice any problems, feel free to submit an issue or start a discussion.

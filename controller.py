@@ -30,10 +30,33 @@ class Controller:
             self.x, self.y = x, y
             self.gamepad.left_joystick_float(x_value_float=x, y_value_float=y)
             self.gamepad.update()
-            # sleep(0.01)
+
+    def setup_UP(self):
+        self.do_movement(0, 1)
+        sleep(0.1)
+        self.do_movement(0, 0)
+        sleep(0.1)
+
+    def setup_DOWN(self):
+        self.do_movement(0, -1)
+        sleep(0.1)
+        self.do_movement(0, 0)
+        sleep(0.1)
+
+    def setup_LEFT(self):
+        self.do_movement(-1, 0)
+        sleep(0.1)
+        self.do_movement(0, 0)
+        sleep(0.1)
+
+    def setup_RIGHT(self):
+        self.do_movement(1, 0)
+        sleep(0.1)
+        self.do_movement(0, 0)
+        sleep(0.1)
 
 
-@lru_cache(maxsize=2**20)
+@lru_cache(maxsize=2 ** 20)
 def clamp(n, minimum=-1.0, maximum=1.0):
     # TODO Return to this
     if n > maximum:
@@ -46,6 +69,5 @@ def clamp(n, minimum=-1.0, maximum=1.0):
 if __name__ == "__main__":
     controller = Controller()
     sleep(0.1)
-    controller.load_state()
     while True:
-        controller.load_state()
+        controller.load_state()  # Replace this line with setup functions

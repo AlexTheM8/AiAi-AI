@@ -140,6 +140,7 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
         elif options.zero_kill:
             if img_similarity(img, zero_mph, zm_shape, threshold=0.94):
                 zero_step += 60
+            step += 1
         else:
             step += 1
         if not done and (step > max_steps or zero_step > max_steps):

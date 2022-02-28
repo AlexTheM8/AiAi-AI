@@ -142,7 +142,6 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
                 zero_step += 60
         else:
             step += 1
-            zero_step = 0
         if not done and (step > max_steps or zero_step > max_steps):
             done = True
             if step > max_steps or zero_step > max_steps:
@@ -205,7 +204,7 @@ filterwarnings("ignore", category=UserWarning)
 filterwarnings("ignore", category=RuntimeWarning)
 model = hub.load('yolov5', 'custom', 'yolov5/runs/train/exp/weights/best.pt', source='local')
 
-max_steps = 500
+max_steps = 600
 max_fitness = {}
 
 if __name__ == '__main__':

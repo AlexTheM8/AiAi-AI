@@ -17,11 +17,10 @@ Super Monkey Ball AI using NEAT and YOLO
     1. [Save State Setup](#save-state-setup)
     1. [Launch AI Agent](#launch-ai-agent)
     1. [Customizing Options](#Customizing-Options)
-        1. [Logging & Stats](#logging--stats)
+        1. [Runtime Arguments](#runtime-arguments)
         1. [Network](#network)
         1. [Goal Detection](#goal-detection)
     1. [Known Issues](#Known-Issues)
-1. [Future Work](#Future-Work)
 
 ## Project Description
 This repository contains the excessive work completed in an attempt to create an artificial intelligence agent in the game *Super Monkey Ball*.
@@ -183,7 +182,7 @@ From there, you should see the program load up the save state and begin evolutio
 ### Customizing Options
 To customize behavior, there are some options and features available in the AiAi AI. These options include logging and stat-tracking as well as network customization options.
 
-#### Logging & Stats
+#### Runtime Arguments
 To customize the amount of messages displayed when running, there are three logging options: `[FULL, PARTIAL, NONE]`. The `FULL` logging option (enabled by default) will display all available logs during evolution. The `PARTIAL` logging option will display the max fitness of the most-recently executed genome along with the default NEAT logs. The `NONE` logging option will only display the default NEAT logs.
 
 ```
@@ -205,6 +204,8 @@ To speed up evolution, there is a feature where a given genome will be terminate
 python aiai_ai --zero_kill true
                 -z         false
 ```
+
+TODO Window scale
 
 #### Network
 As part of the NEAT library, the neural network can be customized in a number of ways. For a full description of all customization options, see the [NEAT documentation](https://neat-python.readthedocs.io/en/latest/index.html). Some of these options in the `config-feedforward` document will be highlighted here.

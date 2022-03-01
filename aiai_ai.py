@@ -206,10 +206,10 @@ if __name__ == '__main__':
         x_pad, y_pad, width, height = win32gui.GetWindowRect(window)
         width -= x_pad
         height -= y_pad
-        x_pad = round((x_pad + border_x + 1) * options.window_scale)
-        y_pad = round((y_pad + border_y) * options.window_scale)
-        width = round((width - (border_x * 2)) * options.window_scale)
-        height = round((height - (border_y + 8)) * options.window_scale)
+        x_pad = int(x_pad * options.window_scale) + round((border_x + 1) * options.window_scale)
+        y_pad = int(y_pad * options.window_scale) + round(border_y * options.window_scale)
+        width = int(width * options.window_scale) - round((border_x * 2) * options.window_scale)
+        height = int(height * options.window_scale) - round((border_y + 6.25) * options.window_scale)
         monitor = {"top": y_pad, "left": x_pad, "width": width, "height": height}
     else:
         print('ERROR: Could not find SMB window')

@@ -9,6 +9,7 @@ from warnings import filterwarnings
 import cv2
 import neat
 import numpy as np
+import win32gui
 from mss import mss as sct
 from skimage.metrics import structural_similarity as compare_ssim
 from torch import hub
@@ -173,40 +174,12 @@ def eval_genomes(genomes, cfg):
     max_fitness[p.generation] = max_fit
 
 
-# Controller
-controller = Controller()
+def enumHandler(hwnd, lParam):
+    global window
+    name = win32gui.GetWindowText(hwnd)
+    if 'Dolphin' in name and 'Super Monkey Ball' in name:
+        window = hwnd
 
-# Image setup
-width, height, x_pad, y_pad, scale = 1300, 1000, 310, 30, 25
-mon = sct().monitors[2]
-monitor = {"top": mon["top"] + y_pad, "left": mon["left"] + x_pad, "width": width, "height": height}
-inx, iny, inc = width // scale, height // scale, 3
-rgb_low, rgb_up = np.array([0, 10, 0]), np.array([120, 255, 100])
-
-# Reference images
-time_over = cv2.imread('images/time_over.png')
-to_x_pad, to_y_pad = 405, 460
-to_shape = (to_x_pad - x_pad, to_y_pad - y_pad)
-
-goal = cv2.imread('images/goal.png')
-g_x_pad, g_y_pad = 700, 635
-g_shape = (g_x_pad - x_pad, g_y_pad - y_pad)
-
-fall_out = cv2.imread('images/fall_out.png')
-fo_x_pad, fo_y_pad = 430, 445
-fo_shape = (fo_x_pad - x_pad, fo_y_pad - y_pad)
-
-zero_mph = cv2.imread('images/zeromph.png')
-zm_x_pad, zm_y_pad = 410, 880
-zm_shape = (zm_x_pad - x_pad, zm_y_pad - y_pad)
-
-# Goal detection
-filterwarnings("ignore", category=UserWarning)
-filterwarnings("ignore", category=RuntimeWarning)
-model = hub.load('yolov5', 'custom', 'yolov5/runs/train/exp/weights/best.pt', source='local')
-
-max_steps = 600
-max_fitness = {}
 
 if __name__ == '__main__':
     parser = OptionParser()
@@ -217,8 +190,63 @@ if __name__ == '__main__':
                       action='store_true', default=True)
     parser.add_option('-z', '--zero_kill', dest='zero_kill',
                       help='Argument for killing genome at 0mph. (Default=true)', action='store_true', default=True)
+    parser.add_option('--window_scale', '-w', dest='window_scale', type=float, default=1.0,
+                      help='Scale of window size. Ex: 1.0, 1.25, 1.5 (Default=1.0)')
 
     options, args = parser.parse_args()
+
+    # Controller
+    controller = Controller()
+
+    # Image setup
+    window, width, height = None, 0, 0
+    win32gui.EnumWindows(enumHandler, None)
+    if window is not None:
+        border_x, border_y = 7, 31
+        x_pad, y_pad, width, height = win32gui.GetWindowRect(window)
+        width -= x_pad
+        height -= y_pad
+        x_pad = int(x_pad * options.window_scale) + round((border_x + 1) * options.window_scale)
+        y_pad = int(y_pad * options.window_scale) + round(border_y * options.window_scale)
+        width = int(width * options.window_scale) - round((border_x * 2) * options.window_scale)
+        height = int(height * options.window_scale) - round((border_y + 6.25) * options.window_scale)
+        monitor = {"top": y_pad, "left": x_pad, "width": width, "height": height}
+    else:
+        print('ERROR: Could not find SMB window')
+        exit(-1)
+    orig_width, orig_height, orig_x_pad, orig_y_pad, scale = 1300, 1000, 310, 30, 25
+    rescale_w, rescale_h = width / orig_width, height / orig_height
+    inx, iny, inc = width // scale, height // scale, 3
+    rgb_low, rgb_up = np.array([0, 10, 0]), np.array([120, 255, 100])
+
+    # Reference images
+    time_over = cv2.imread('images/time_over.png')
+    time_over = cv2.resize(time_over, (int(time_over.shape[1] * rescale_w), int(time_over.shape[0] * rescale_h)))
+    to_x_pad, to_y_pad = 405 * rescale_w, 460 * rescale_h
+    to_shape = (int(to_x_pad) - int(orig_x_pad * rescale_w), int(to_y_pad) - int(orig_y_pad * rescale_h))
+
+    goal = cv2.imread('images/goal.png')
+    goal = cv2.resize(goal, (int(goal.shape[1] * rescale_w), int(goal.shape[0] * rescale_h)))
+    g_x_pad, g_y_pad = 700 * rescale_w, 635 * rescale_h
+    g_shape = (int(g_x_pad) - int(orig_x_pad * rescale_w), int(g_y_pad) - int(orig_y_pad * rescale_h))
+
+    fall_out = cv2.imread('images/fall_out.png')
+    fall_out = cv2.resize(fall_out, (int(fall_out.shape[1] * rescale_w), int(fall_out.shape[0] * rescale_h)))
+    fo_x_pad, fo_y_pad = 430 * rescale_w, 445 * rescale_h
+    fo_shape = (int(fo_x_pad) - int(orig_x_pad * rescale_w), int(fo_y_pad) - int(orig_y_pad * rescale_h))
+
+    zero_mph = cv2.imread('images/zeromph.png')
+    zero_mph = cv2.resize(zero_mph, (int(zero_mph.shape[1] * rescale_w), int(zero_mph.shape[0] * rescale_h)))
+    zm_x_pad, zm_y_pad = (410 * rescale_w) - (orig_x_pad * rescale_w), (880 * rescale_h) - (orig_y_pad * rescale_h)
+    zm_shape = (int(zm_x_pad), int(zm_y_pad))
+
+    # Goal detection
+    filterwarnings("ignore", category=UserWarning)
+    filterwarnings("ignore", category=RuntimeWarning)
+    model = hub.load('yolov5', 'custom', 'yolov5/runs/train/exp/weights/best.pt', source='local')
+
+    max_steps = 2000
+    max_fitness = {}
 
     logger = create_logger(options.logging)
 

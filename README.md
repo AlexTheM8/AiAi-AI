@@ -181,7 +181,9 @@ Once all the previous steps are completed, launch the *Super Monkey Ball* ROM on
 python aiai_ai
 ```
 
-From there, you should see the program load up the save state and begin evolution **IMPORTANT** After starting evolution DO NOT MOVE THE EMULATION WINDOW. If you want to move the window, restart the program.
+From there, you should see the program load up the save state and begin evolution.
+ 
+ **IMPORTANT**: After starting evolution DO NOT MOVE THE EMULATION WINDOW. If you want to move the window, restart the program.
 
 ### Customizing Options
 To customize behavior, there are some options and features available in the AiAi AI. These options include logging and stat-tracking as well as network customization options.

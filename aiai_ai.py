@@ -29,7 +29,7 @@ def create_logger(option):
     log.setLevel(logging.DEBUG)
     log.propagate = False
 
-    if option != LogOptions.NONE:
+    if option != LogOptions.NONE.value:
         console_handle = logging.StreamHandler()
         console_handle.setLevel(logging.DEBUG)
 
@@ -111,7 +111,7 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
     current_max_fitness, g_max, step, zero_step, done = 0, 0, 0, 0, False
 
     controller.load_state()
-    if options.logging == LogOptions.FULL:
+    if options.logging == LogOptions.FULL.value:
         logger.info(f'running genome {genome_id} in generation {p.generation}')
     st = perf_counter()
     # step_list = np.array([])
@@ -131,7 +131,7 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
 
         g_max, done, info = interpret_and_act(img, x_input, y_input, st, g_max)
 
-        if info != '' and options.logging == LogOptions.FULL:
+        if info != '' and options.logging == LogOptions.FULL.value:
             logger.info(f'{info}')
 
         if g_max > current_max_fitness:
@@ -147,7 +147,7 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
         if not done and (step > max_steps or zero_step > max_steps):
             done = True
             if step > max_steps or zero_step > max_steps:
-                if options.logging == LogOptions.FULL:
+                if options.logging == LogOptions.FULL.value:
                     logger.info('Timed out due to stagnation')
                 g_max -= 25
         genome.fitness = g_max
@@ -184,8 +184,8 @@ def enumHandler(hwnd, lParam):
 if __name__ == '__main__':
     parser = OptionParser()
 
-    parser.add_option('-l', '--logging', dest='logging', choices=[o for o in LogOptions],
-                      help='Logging options: [full, partial, none]. (Default=full)', default=LogOptions.FULL)
+    parser.add_option('-l', '--logging', dest='logging', choices=[o.value for o in LogOptions],
+                      help='Logging options: [full, partial, none]. (Default=full)', default=LogOptions.FULL.value)
     parser.add_option('-s', '--stats', dest='stats', help='Argument for saving evolution stats. (Default=true)',
                       action='store_true', default=True)
     parser.add_option('-z', '--zero_kill', dest='zero_kill',

@@ -1,8 +1,19 @@
+from enum import Enum
 from functools import lru_cache
+from optparse import OptionParser
 from random import uniform
 from time import sleep
 
 import vgamepad as vg
+
+
+class SetupOptions(Enum):
+    LOAD = 'load'
+    UP = 'up'
+    DOWN = 'down'
+    LEFT = 'left'
+    RIGHT = 'right'
+    RANDOM = 'random'
 
 
 class Controller:
@@ -67,7 +78,30 @@ def clamp(n, minimum=-1.0, maximum=1.0):
 
 
 if __name__ == "__main__":
+    parser = OptionParser()
+
+    parser.add_option('-s', '--setup', dest='setup', choices=[o.value for o in SetupOptions],
+                      help='Setup options: [load, up, down, left, right, random]')
+
+    options, _ = parser.parse_args()
+
+    setup = options.setup
+
     controller = Controller()
     sleep(0.1)
     while True:
-        controller.load_state()  # Replace this line with setup functions
+        if setup == SetupOptions.LOAD.value:
+            controller.load_state()
+        elif setup == SetupOptions.UP.value:
+            controller.setup_UP()
+        elif setup == SetupOptions.DOWN.value:
+            controller.setup_DOWN()
+        elif setup == SetupOptions.LEFT.value:
+            controller.setup_LEFT()
+        elif setup == SetupOptions.RIGHT.value:
+            controller.setup_RIGHT()
+        elif setup == SetupOptions.RANDOM.value:
+            controller.random_movement()
+        else:
+            print('Invalid option')
+            break

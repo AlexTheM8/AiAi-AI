@@ -117,7 +117,7 @@ Pulling up the Dolphin hotkey controls, navigate to the `Save and Load State` ta
 Once there, execute the following command:
 
 ```
-python controller.py
+python controller -s load
 ```
 
 This will set the controller to repeatedly press the virtual button designated to loading the game's state. Follow these steps to configure the `Load State` hotkey.
@@ -137,29 +137,18 @@ For the joystick controls, navigate to the Dolphin controller config menu.
 
 ![dolphin_controls_default](./docs/dolphin_controls_default.PNG)
 
-In the `controller.py` code, you will see the following code block at the end of the script:
-
-```
-if __name__ == "__main__":
-    controller = Controller()
-    sleep(0.1)
-    while True:
-        controller.load_state()
-```
-
 To configure the joystick in Dolphin, follow these steps:
 
-1. Replace `controller.load_state()` with `controller.setup_UP()`
-1. Execute the command `python controller.py`
-1. In the Dolphin controller config menu, select the `Device` corresponding to the virtual gamepad (as described in [Hotkey Config](#hotkey-config), the device is not universally labeled, so steps 4-6 may need to be repeated until device is found)
+1. Execute the command `python controller -s up`
+1. In the Dolphin controller config menu, select the `Device` corresponding to the virtual gamepad (as described in [Hotkey Config](#hotkey-config), the device is not universally labeled, so steps 3-5 may need to be repeated until device is found)
 1. Under the `Control Stick` section, click the box next to `Up`
 1. Wait for `Up` to appear in the box
-1. Repeat steps 4 & 5 a few times if it does not appear immediately
+1. Repeat steps 3 & 4 a few times if it does not appear immediately
 1. You should then see `Up` flash bold multiple times along with a visual representation of the joystick moving in the visual above
 1. Terminate the `controller.py` process
-1. Repeats steps 1-8 for each of the directions `[DOWN, LEFT, RIGHT]`, replacing each instance of "Up" with the corresponding direction
+1. Repeats steps 1-7 for each of the directions `[down, left, right]`, replacing each instance of "up" with the corresponding direction
 1. **[OPTIONAL]** Save the configuration as a `Profile` in Dolphin to avoid the need to repeat this process in the future
-1. **[OPTIONAL]** To test the controller configuration, replace the edited section with `controller.random_movement()` and execute the script. The virtual joystick should be moving appropriately
+1. **[OPTIONAL]** To test the controller configuration, execute the command `python controller -s random`. The virtual joystick should be moving appropriately
 
 ![dolphin_controls_config](./docs/dolphin_controls_config.png)
 
@@ -208,6 +197,8 @@ python aiai_ai --zero_kill true
 TODO Window scale
 
 #### Network
+TODO Update section
+
 As part of the NEAT library, the neural network can be customized in a number of ways. For a full description of all customization options, see the [NEAT documentation](https://neat-python.readthedocs.io/en/latest/index.html). Some of these options in the `config-feedforward` document will be highlighted here.
 
 In the `[NEAT]` section, the `fitness_threshold` can be adjusted for the given stage where the fitness can be between `[-50, 105]`. The `pop_size`, or "population size" can be customized, where this number will correspond to how many genomes are in each generation.

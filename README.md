@@ -142,11 +142,11 @@ To configure the joystick in Dolphin, follow these steps:
 1. Execute the command `python controller -s up`
 1. In the Dolphin controller config menu, select the `Device` corresponding to the virtual gamepad (as described in [Hotkey Config](#hotkey-config), the device is not universally labeled, so steps 3-5 may need to be repeated until device is found)
 1. Under the `Control Stick` section, click the box next to `Up`
-1. Wait for `Up` to appear in the box
+1. Wait for `Axis Y-` to appear in the box
 1. Repeat steps 3 & 4 a few times if it does not appear immediately
-1. You should then see `Up` flash bold multiple times along with a visual representation of the joystick moving in the visual above
+1. You should then see `Axis Y-` flash bold multiple times along with a visual representation of the joystick moving in the visual above
 1. Terminate the `controller.py` process
-1. Repeats steps 1-7 for each of the directions `[down, left, right]`, replacing each instance of "up" with the corresponding direction
+1. Repeats steps 1-7 for each of the directions `[down, left, right]`, replacing each instance of "up" with the corresponding direction (`Axis Y+` for down, `Axis X+` for left, `Axis X-` for right)
 1. **[OPTIONAL]** Save the configuration as a `Profile` in Dolphin to avoid the need to repeat this process in the future
 1. **[OPTIONAL]** To test the controller configuration, execute the command `python controller -s random`. The virtual joystick should be moving appropriately
 

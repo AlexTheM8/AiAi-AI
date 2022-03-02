@@ -48,7 +48,7 @@ The design of this project was largely inspired by SethBling's [MarI/O](https://
 The purpose of this project is to create a Super Monkey Ball AI that can reasonably beat standard stages in the game.
 
 ## Results
-TODO
+AiAi AI was tested on three stages: Beginner Floor 1, Beginner Floor 2, and Beginner Floor 3.
 
 ### Hardware Specs
 All results were conducted on the following specs

@@ -73,10 +73,18 @@ git clone https://github.com/AlexTheM8/AiAi-AI.git
 ```
 
 ### Dolphin Emulation Config
-TODO 
+For best results, the following settings should be configured for the Dolphin Emulator.
+
+- In Graphics settings, General, aspect ratio should be set to `Auto` or `Force 3:4`
+- In Graphics settings, General, `Auto-Adjust Window Size` should be checked
+- In Graphics settings, Enhancements, Internal Resolution should be set to `Native 640x528`
+- In Config, Interface, `Keep Window on Top` should be checked
+- In Config, Interface, `Show On-Screen Display Messages` should be un-checked
+- In Config, Interface, `Show Active Title in Window Title` should be checked
+- In Config, Interface, `Pause on Focus Loss` should be un-checked
 
 ### Requirements
-The code of this project was programmed using `Python 3.9.0`. It is currently unknown if this project is functional in any other Python version.
+The code of this project was programmed using `Python 3.9.0` on a Windows 10 machine. It is currently unknown if this project is functional in any other Python version or OS.
 
 Once downloaded, navigate into the project folder and execute the following command to install the Python dependency libraries:
 
@@ -166,7 +174,7 @@ Once all the previous steps are completed, launch the *Super Monkey Ball* ROM on
 python aiai_ai
 ```
 
-From there, you should see the program load up the save state and begin evolution!
+From there, you should see the program load up the save state and begin evolution **IMPORTANT** After starting evolution DO NOT MOVE THE EMULATION WINDOW. If you want to move the window, restart the program.
 
 ### Customizing Options
 To customize behavior, there are some options and features available in the AiAi AI. These options include logging and stat-tracking as well as network customization options.
@@ -194,26 +202,29 @@ python aiai_ai --zero_kill true
                 -z         false
 ```
 
-TODO Window scale
+On Windows systems, a magnification can be applied to the display. Because of this, there is a runtime argument to set the magnification of the used display.
+
+```
+python aiai_ai --window_scale 1.0
+                -w            1.0
+```
+
+Scale must be set as a `float` (ex. 1.0, 1.25, 1.5, etc). **NOTE:** Scale has only been tested for 1.0 and 1.25
 
 #### Network
-TODO Update section
-
 As part of the NEAT library, the neural network can be customized in a number of ways. For a full description of all customization options, see the [NEAT documentation](https://neat-python.readthedocs.io/en/latest/index.html). Some of these options in the `config-feedforward` document will be highlighted here.
 
 In the `[NEAT]` section, the `fitness_threshold` can be adjusted for the given stage where the fitness can be between `[-50, 105]`. The `pop_size`, or "population size" can be customized, where this number will correspond to how many genomes are in each generation.
 
-Under the `network parameters` category of the `[DefaultGenome]` section, the `num_inputs` can be changed to allow for greater analysis on the input image of the game. The `num_inputs` can be any common factor of `1300` and `1000` divided from both numbers, respectively, then multiplied together, then multiplied by `3`. For example, the default `num_inputs` is set to `6240` which is the resulting number of the following equation:
+Under the `network parameters` category of the `[DefaultGenome]` section, the `num_inputs` will be dependent on your window configurations. Best way to know what the `num_inputs` should be set to is by running the AiAi AI program (see [Launch AI Agent](#launch-ai-agent)) and change the value to the received value, in case of execution failure. See the example below.
 
 ```
-(1300 / 25) * (1000 / 25) * 3 = 6240
+File "c:\neat-python\neat\nn\recurrent.py", line 27, in activate
+    raise RuntimeError("Expected {0:n} inputs, got {1:n}".format(len(self.input_nodes), len(inputs)))
+RuntimeError: Expected 1425 inputs, got 5967
 ```
 
-Where `25` is a common factor of both numbers. The common factor used should then be updated as the `scale` parameter in the following line in `aiai_ai.py`:
-
-```
-width, height, x_pad, y_pad, scale = 1300, 1000, 310, 30, 25
-```
+In this example, `num_inputs` should be set to 5967
 
 #### Goal Detection
 The YOLO goal-detection is the primary method of determining a more granular fitness. The main method of customization is through the model training. Please refer to the [YOLO documentation](https://github.com/ultralytics/yolov5) for more information on training customization. To ensure the goal-detection matches the YOLO model, the `size` parameter in the following line in `aiai_ai.py` should match the specifications made in training.

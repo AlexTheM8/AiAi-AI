@@ -51,7 +51,14 @@ The purpose of this project is to create a Super Monkey Ball AI that can reasona
 TODO
 
 ### Hardware Specs
-TODO
+All results were conducted on the following specs
+
+```
+Windows 10
+NVIDIA RTX 3060
+AMD Ryzen 5 3600 6-Core Processor 3.95 GHz
+16 GB RAM
+```
 
 ### Graphs
 TODO

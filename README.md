@@ -60,6 +60,8 @@ AMD Ryzen 5 3600 6-Core Processor 3.95 GHz
 16 GB RAM
 ```
 
+With these specs, and default configurations, the AI is able to analyze the game at approximately 30 FPS, essentially every other frame of the game.
+
 ### Graphs
 TODO
 

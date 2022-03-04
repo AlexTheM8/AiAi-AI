@@ -69,7 +69,7 @@ def detect_goal(img):
     results = ref.xyxy[0]
     if len(results) > 0:
         x1, y1, x2, y2, prob, _ = results[0]
-        if prob > 0.84:
+        if prob > 0.855:
             x1, y1, x2, y2 = float(x1), float(y1), float(x2), float(y2)
             g = min((((x2 - x1) * (y2 - y1)) / (width * height)) * 125, 50)
             if g > 30:
@@ -214,7 +214,7 @@ if __name__ == '__main__':
     else:
         print('ERROR: Could not find SMB window')
         exit(-1)
-    orig_width, orig_height, orig_x_pad, orig_y_pad, scale = 1300, 1000, 310, 30, 25
+    orig_width, orig_height, orig_x_pad, orig_y_pad, scale = 1300, 1000, 310, 30, 14
     rescale_w, rescale_h = width / orig_width, height / orig_height
     inx, iny, inc = width // scale, height // scale, 3
     rgb_low, rgb_up = np.array([0, 10, 0]), np.array([120, 255, 100])
@@ -238,7 +238,7 @@ if __name__ == '__main__':
     zero_mph = cv2.imread('images/zeromph.png')
     zero_mph = cv2.resize(zero_mph, (int(zero_mph.shape[1] * rescale_w), int(zero_mph.shape[0] * rescale_h)))
     zm_x_pad, zm_y_pad = (410 * rescale_w) - (orig_x_pad * rescale_w), (880 * rescale_h) - (orig_y_pad * rescale_h)
-    zm_shape = (int(zm_x_pad), int(zm_y_pad))
+    zm_shape = (int(zm_x_pad), int(zm_y_pad) + 3)
 
     # Goal detection
     filterwarnings("ignore", category=UserWarning)

@@ -87,7 +87,7 @@ def interpret_and_act(img, x_input, y_input, st, g_max):
         g_max -= 25  # [-25, 25]
         done, info = True, 'Time Over'
     elif img_similarity(img, fall_out, fo_shape):
-        g_max -= 50  # [-50, 0]
+        g_max -= 25  # [-50, 0] TODO Testing
         done, info = True, 'Fall Out'
     elif img_similarity(img, goal, g_shape):
         g_max = 30 + (1.25 * (60 - (perf_counter() - st)))  # [30, 105]
@@ -184,12 +184,14 @@ def enumHandler(hwnd, lParam):
 if __name__ == '__main__':
     parser = OptionParser()
 
+    parser.set_defaults(stats=True, zero_kill=True)
+
     parser.add_option('-l', '--logging', dest='logging', choices=[o.value for o in LogOptions],
                       help='Logging options: [full, partial, none]. (Default=full)', default=LogOptions.FULL.value)
-    parser.add_option('-s', '--stats', dest='stats', help='Argument for saving evolution stats. (Default=true)',
-                      action='store_true', default=True)
+    parser.add_option('-s', '--stats', dest='stats',
+                      help='Enable this flag to stop saving evolution stats. (Default=true)', action='store_false')
     parser.add_option('-z', '--zero_kill', dest='zero_kill',
-                      help='Argument for killing genome at 0mph. (Default=true)', action='store_true', default=True)
+                      help='Enable this flag to stop killing genome at 0mph. (Default=true)', action='store_false')
     parser.add_option('--window_scale', '-w', dest='window_scale', type=float, default=1.0,
                       help='Scale of window size. Ex: 1.0, 1.25, 1.5 (Default=1.0)')
 

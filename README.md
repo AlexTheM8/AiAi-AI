@@ -202,15 +202,15 @@ python aiai_ai --logging full
 Along with the evolution logging, there is a stat-tracking document that saves the max fitness, mean fitness, and standard deviation of each generation (saved as a CSV file labeled `stats.csv`). This file is enabled by default, but can be disabled as an execution parameter.
 
 ```
-python aiai_ai --stats true
-                -s     false
+python aiai_ai --stats
+                -s
 ```
 
 To speed up evolution, there is a feature where a given genome will be terminated early if it is not moving for too long. This is enabled by default, but can be disabled at execution. **NOTE:** feature should be disabled for stages that may require the player to wait.
 
 ```
-python aiai_ai --zero_kill true
-                -z         false
+python aiai_ai --zero_kill
+                -z
 ```
 
 On Windows systems, a magnification can be applied to the display. Because of this, there is a runtime argument to set the magnification of the used display.

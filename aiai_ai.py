@@ -69,11 +69,11 @@ def detect_goal(img):
     results = ref.xyxy[0]
     if len(results) > 0:
         x1, y1, x2, y2, prob, _ = results[0]
-        if prob > 0.855:
+        if prob > 0.868:
             x1, y1, x2, y2 = float(x1), float(y1), float(x2), float(y2)
             g = min((((x2 - x1) * (y2 - y1)) / (width * height)) * 125, 50)
-            if g > 30:
-                logger.info(f'prob: {prob}, g: {g}')
+            # if g > 15:
+            #     logger.info(f'prob: {prob}, g: {g}')
     return g
 
 
@@ -87,7 +87,7 @@ def interpret_and_act(img, x_input, y_input, st, g_max):
         g_max -= 25  # [-25, 25]
         done, info = True, 'Time Over'
     elif img_similarity(img, fall_out, fo_shape):
-        g_max -= 25  # [-50, 0] TODO Testing
+        g_max -= 25  # [-25, 0]
         done, info = True, 'Fall Out'
     elif img_similarity(img, goal, g_shape):
         g_max = 30 + (1.25 * (60 - (perf_counter() - st)))  # [30, 105]
@@ -106,7 +106,9 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
 
     net = neat.nn.recurrent.RecurrentNetwork.create(genome, cfg)
 
+    get_img()
     sleep(2.5)  # Allow time to load up
+    get_img()
 
     current_max_fitness, g_max, step, zero_step, done = 0, 0, 0, 0, False
 

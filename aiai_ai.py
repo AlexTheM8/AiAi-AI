@@ -106,9 +106,10 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
 
     net = neat.nn.recurrent.RecurrentNetwork.create(genome, cfg)
 
-    get_img()
-    sleep(2.5)  # Allow time to load up
-    get_img()
+    sleep(1.25)
+    controller.load_state()
+    img = get_img()
+    sleep(1.25)  # Allow time to load up
 
     current_max_fitness, g_max, step, zero_step, done = 0, 0, 0, 0, False
 
@@ -141,7 +142,7 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
             step, zero_step = 0, 0
         # TODO Review threshold
         elif options.zero_kill:
-            if img_similarity(img, zero_mph, zm_shape, threshold=0.94):
+            if img_similarity(img, zero_mph, zm_shape, threshold=0.922):
                 zero_step += 60
             step += 1
         else:
@@ -183,6 +184,7 @@ def enumHandler(hwnd, lParam):
         window = hwnd
 
 
+# TODO Figure out playback settings
 if __name__ == '__main__':
     parser = OptionParser()
 
@@ -232,7 +234,7 @@ if __name__ == '__main__':
     goal = cv2.imread('images/goal.png')
     goal = cv2.resize(goal, (int(goal.shape[1] * rescale_w), int(goal.shape[0] * rescale_h)))
     g_x_pad, g_y_pad = 700 * rescale_w, 635 * rescale_h
-    g_shape = (int(g_x_pad) - int(orig_x_pad * rescale_w), int(g_y_pad) - int(orig_y_pad * rescale_h))
+    g_shape = (int(g_x_pad) - int(orig_x_pad * rescale_w), int(g_y_pad) - int(orig_y_pad * rescale_h) + 2)
 
     fall_out = cv2.imread('images/fall_out.png')
     fall_out = cv2.resize(fall_out, (int(fall_out.shape[1] * rescale_w), int(fall_out.shape[0] * rescale_h)))

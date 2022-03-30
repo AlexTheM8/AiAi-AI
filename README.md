@@ -63,16 +63,35 @@ AMD Ryzen 5 3600 6-Core Processor 3.95 GHz
 With these specs, and default configurations, the AI is able to analyze the game at approximately 30 FPS, essentially every other frame of the game.
 
 ### Graphs
-TODO
+So far, the AiAi AI has been tested on beginner floors 1, 2, and 7. These were chosen for their relative simplicity in layout, allowing for an easier evolution for the population.
 
 #### Floor 1
-TODO
+
+![floor_one_overview](./docs/floor_one_overview.png)
+
+Due to it's nature, [Floor 1](https://supermonkeyball.fandom.com/wiki/Plain) is the simplest stage, only requiring the player to move straight ahead. Because of it's simplicity, it did not take long for the population to surpass the max expected fitness score of `101`. Therefore, to gain further information about the population's evolution, a second run was conducted to see how high the average fitness for the population could achieve. The results are graphed below.
+
+##### First Run
+![floor_one_graph](./docs/floor_one_graph.png)
+
+##### Second Run
+![floor_one_mean_graph](./docs/floor_one_mean_graph.png)
 
 #### Floor 2
-TODO
+
+![floor_two_overview](./docs/floor_two_overview.png)
+
+Beginner [Floor 2](https://supermonkeyball.fandom.com/wiki/Diamond) adds complexity to Floor 1 by having a gap in the middle of the stage. As the graph shows, it took the population a significant amount of generations to reach a higher maximum fitness. For this stage, the expected fitness threshold was `99.5`. However, the population only reached a maximum of `98.76`. After 323 generations, the process was halted.
+
+![floor_two_graph](./docs/floor_two_graph.png)
 
 #### Floor 7
-TODO
+
+![floor_seven_overview](./docs/floor_seven_overview.png)
+
+[Floor 7](https://supermonkeyball.fandom.com/wiki/Steps) was a significant increase in complexity to test the overall capabilities of the system. The expected fitness threshold was set to `90`. However, the population never officially crossed the goal. Despite this, there was significant progress made towards reaching the goal. The population almost reached the goal several times, even getting the maximum failure score of `25` (reached the goal, but never crossed).
+
+![floor_seven_graph](./docs/floor_seven_graph.png)
 
 ## How To Use
 To utilize this project, be sure to have a working version of the [Dolphin Emulator](https://dolphin-emu.org) installed on your machine, along with a ROM of [Super Monkey Ball for GameCube](https://en.wikipedia.org/wiki/Super_Monkey_Ball_(video_game)). The project can be downloaded onto your local machine using the following command:

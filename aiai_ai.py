@@ -87,7 +87,7 @@ def interpret_and_act(img, x_input, y_input, st, g_max):
         g_max -= 25  # [-25, 25]
         done, info = True, 'Time Over'
     elif img_similarity(img, fall_out, fo_shape):
-        g_max -= 25  # [-25, 0]
+        g_max -= 25  # [-25, 25]
         done, info = True, 'Fall Out'
     elif img_similarity(img, goal, g_shape):
         g_max = 30 + (1.25 * (60 - (perf_counter() - st)))  # [30, 105]

@@ -43,7 +43,7 @@ The highest fitness score during a given genome's runtime will be the score eval
 YOLO (You Only Look Once) is used as a metric of determining how close a given genome is to the Goal. In short, the YOLO model detects the size and location of the Goal (if one is present), returning a bounding box of the Goal. The area of the bounding box is used to calculate the percentage of the screen the Goal occupies. If the Goal occupies at least 40% of the screen, the given genome will be given the max reward possible for `TIME OVER` or `FALL OUT` states.
 
 ## Inspiration And Purpose
-The design of this project was largely inspired by SethBling's [MarI/O](https://www.youtube.com/watch?v=qv6UVOQ0F44). The inspiration of starting this project came from my wife holding three [World Records](https://www.speedrun.com/smbbm) in *Super Monkey Ball: Banana Mania* speedruns (as of February 23rd, 2022). I simply wanted to feel better about my inadequacy in this series.
+The design of this project was largely inspired by SethBling's [MarI/O](https://www.youtube.com/watch?v=qv6UVOQ0F44). The inspiration of starting this project came from my wife holding three [World Records](https://www.speedrun.com/smbbm) in *Super Monkey Ball: Banana Mania* speedruns (as of April 4th, 2022). I simply wanted to feel better about my inadequacy in this series.
 
 The purpose of this project is to create a Super Monkey Ball AI that can reasonably beat standard stages in the game.
 

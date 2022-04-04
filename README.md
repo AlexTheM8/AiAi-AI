@@ -89,7 +89,7 @@ Beginner [Floor 2](https://supermonkeyball.fandom.com/wiki/Diamond) adds complex
 
 ![floor_seven_overview](./docs/floor_seven_overview.png)
 
-[Floor 7](https://supermonkeyball.fandom.com/wiki/Steps) was a significant increase in complexity to test the overall capabilities of the system. The expected fitness threshold was set to `90`. However, the population never officially crossed the goal. Despite this, there was significant progress made towards reaching the goal. The population almost reached the goal several times, even getting the maximum failure score of `25` (reached the goal, but never crossed).
+[Floor 7](https://supermonkeyball.fandom.com/wiki/Steps) was a significant increase in complexity to test the overall capabilities of the system. The expected fitness threshold was set to `90`. However, the population never officially crossed the goal. Despite this, there was significant progress made towards reaching the goal. The population almost reached the goal several times, but not close enough to get the fitness score out of the negatives.
 
 ![floor_seven_graph](./docs/floor_seven_graph.png)
 

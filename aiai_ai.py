@@ -142,7 +142,7 @@ def conduct_genome(genome, cfg, genome_id, pop=None):
             step, zero_step = 0, 0
         # TODO Review threshold
         elif options.zero_kill:
-            if img_similarity(img, zero_mph, zm_shape, threshold=0.922):
+            if img_similarity(img, zero_mph, zm_shape, threshold=0.883):
                 zero_step += 60
             step += 1
         else:

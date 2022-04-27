@@ -23,7 +23,7 @@ Super Monkey Ball AI using NEAT and YOLO
     1. [Known Issues](#Known-Issues)
 
 ## Project Description
-This repository contains the excessive work completed in an attempt to create an artificial intelligence agent in the game *Super Monkey Ball*.
+This repository contains the excessive work completed in an attempt to create an artificial intelligence agent in the game *Super Monkey Ball*. Check out [this video](https://www.youtube.com/watch?v=JCW4fcwFM8M) on the project.
 
 ### Technologies Used
 This project utilizes two technologies: [NEAT](https://github.com/CodeReclaimers/neat-python) and [YOLO](https://github.com/ultralytics/yolov5). The game is expected to be played on the [Dolphin Emulator](https://dolphin-emu.org).
